@@ -1,2 +1,8 @@
-# Batch-image-256-256-resizer
-Batch image 256×256 resizer
+# Batch image resizer script
+-
+
+<p align="left">
+  <strong>-</strong>
+  <br/>
+  <img src=""/>
+</p>
