@@ -18,6 +18,8 @@ def procesar_directorio_imagenes():
     
     # Mostrar separador visual para inicio de resultados
     print("-" * 36)
+
+    cont_archivos = 0 # Contador de archivos generados
     
     # Procesar recursivamente cada imagen en el directorio
     for extension_val in extensiones_lista:
@@ -55,13 +57,19 @@ def procesar_directorio_imagenes():
                 directorio_salida = carpeta_salida / ruta_relativa
                 
                 # Crear directorio para guardar imagen
-                directorio_salida.parent.mkdir(parents = True, exist_ok = True)
+                directorio_salida.mkdir(parents = True, exist_ok = True)
                 
                 # Guardar imágen en directorio de salida correspondiente
                 cv2.imwrite(str(directorio_salida / archivo_dir.with_suffix(".jpg").name), imagen_val)
                 
                 # Mostrar archivo procesado
                 print(str(archivo_dir))
+
+                cont_archivos += 1 # Aumentar el contador de archivos
+
+    # En caso de no procesar ninguna imagen
+    if cont_archivos == 0:
+        print("No images processed")
     
     # Mostrar separador final
     print("-" * 36 + "\n")
