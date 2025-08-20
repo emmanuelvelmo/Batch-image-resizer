@@ -7,7 +7,7 @@ valor_usuario = 0
 directorio_entrada = ""
 
 # FUNCIONES
-procesar_directorio_imagenes():
+def procesar_directorio_imagenes():
     global extensiones_lista, valor_usuario, directorio_entrada, ancho_val, alto_val
 
     # Generar nombre para directorio de salida
@@ -24,8 +24,7 @@ procesar_directorio_imagenes():
                 imagen_val = cv2.imread(str(archivo_iter))
 
                 # Capturar dimensiones de la imagen
-                ancho_val = cv2.height(imagen_val) #############################################################################
-                alto_val = cv2.height(imagen_val) #############################################################################
+                alto_val, ancho_val = imagen_val.shape[:2]
                 
                 lado_minimo = 0
 
@@ -40,19 +39,23 @@ procesar_directorio_imagenes():
                 alto_val = round(alto_val * (valor_usuario / lado_minimo))
 
                 # Redimensionar imagen a nuevos valores de ancho y alto
-                imagen_val = cv2.() #############################################################################
-
-                # Generar ruta relativa para mantener estructura de directorios
-                carpeta_destino = pathlib.Path(directorio_salida) / pathlib.Path(iter_carpeta).relative_to(pathlib.Path(directorio_entrada)) #############################################################################
+                imagen_val = cv2.resize(imagen_val, (ancho_val, alto_val))
+                
+                # Convertir imagen a JPG con calidad a 90%
+                ok_val, imagen_val = cv2.imencode(".jpg", imagen_val, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                imagen_val = cv2.imdecode(imagen_val, cv2.IMREAD_UNCHANGED) # Decodificar el buffer de memoria para volver a obtener la imagen ya comprimida en formato OpenCV
+                
+                # Generar ruta completa de archivo de salida
+                directorio_salida = pathlib.Path(directorio_salida) / archivo_iter.parent.relative_to(pathlib.Path(directorio_entrada)) / archivo_iter.with_suffix(".jpg").name
         
                 # Crear carpeta de destino si no existe
-                carpeta_destino.mkdir(parents = True, exist_ok = True)
+                directorio_salida.parent.mkdir(parents = True, exist_ok = True)
 
                 # Guardar imágen en directorio de salida correspondiente
-                cv2.save(imagen_val) #############################################################################
+                cv2.imwrite(str(directorio_salida), imagen_val)
 
                 # Mostrar archivo procesado
-                print("directorio/archivo.extension") #############################################################################
+                print(str(directorio_salida))
 
     # Mostrar separador final
     print("-" * 36 + "\n")
@@ -75,10 +78,12 @@ procesar_directorio_imagenes():
             valor_usuario = input("Enter minimum size for width or height: ")
             
             # Únicamente número
-            if valor_usuario != : #############################################################################
-                print("Wrong format\n")
-            else:
+            if valor_usuario.isdigit():
+                valor_usuario = int(valor_usuario)
+                
                 break
+            else:
+                print("Wrong format\n")
         
         # Procesar directorio de imágenes recursivamente
         procesar_directorio_imagenes()
