@@ -11,17 +11,20 @@ def procesar_directorio_imagenes():
     global extensiones_lista, valor_usuario, directorio_entrada, ancho_val, alto_val
     
     # Generar nombre para directorio de salida
-    directorio_salida = f"{pathlib.Path(directorio_entrada).name} (output)"
+    carpeta_salida = pathlib.Path(directorio_entrada).parent / f"{pathlib.Path(directorio_entrada).name} (output)"
+
+    # Crear carpeta de destino si no existe
+    carpeta_salida.mkdir(parents = True, exist_ok = True)
     
     # Mostrar separador visual para inicio de resultados
     print("-" * 36)
     
     # Procesar recursivamente cada imagen en el directorio
     for extension_val in extensiones_lista:
-        for archivo_iter in pathlib.Path(directorio_entrada).rglob(f'*.{extension_val}'):
-            if archivo_iter.is_file():
+        for archivo_dir in pathlib.Path(directorio_entrada).rglob(f'*.{extension_val}'):
+            if archivo_dir.is_file():
                 # Cargar imagen desde archivo usando OpenCV
-                imagen_val = cv2.imread(str(archivo_iter))
+                imagen_val = cv2.imread(str(archivo_dir))
                 
                 # Capturar dimensiones de la imagen
                 alto_val, ancho_val = imagen_val.shape[:2]
@@ -44,18 +47,21 @@ def procesar_directorio_imagenes():
                 # Convertir imagen a JPG con calidad a 90%
                 ok_val, imagen_val = cv2.imencode(".jpg", imagen_val, [cv2.IMWRITE_JPEG_QUALITY, 90])
                 imagen_val = cv2.imdecode(imagen_val, cv2.IMREAD_UNCHANGED) # Decodificar el buffer de memoria para volver a obtener la imagen ya comprimida en formato OpenCV
-                
+
+                # Ruta relativa
+                ruta_relativa = archivo_dir.parent.relative_to(directorio_entrada)
+
                 # Generar ruta completa de archivo de salida
-                directorio_salida = pathlib.Path(directorio_salida) / archivo_iter.parent.relative_to(pathlib.Path(directorio_entrada)) / archivo_iter.with_suffix(".jpg").name
+                directorio_salida = carpeta_salida / ruta_relativa
                 
-                # Crear carpeta de destino si no existe
+                # Crear directorio para guardar imagen
                 directorio_salida.parent.mkdir(parents = True, exist_ok = True)
                 
                 # Guardar imágen en directorio de salida correspondiente
-                cv2.imwrite(str(directorio_salida), imagen_val)
+                cv2.imwrite(str(directorio_salida / archivo_dir.with_suffix(".jpg").name), imagen_val)
                 
                 # Mostrar archivo procesado
-                print(str(directorio_salida))
+                print(str(archivo_dir))
     
     # Mostrar separador final
     print("-" * 36 + "\n")
