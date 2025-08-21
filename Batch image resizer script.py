@@ -46,8 +46,8 @@ def procesar_directorio_imagenes():
                 # Redimensionar imagen a nuevos valores de ancho y alto
                 imagen_val = cv2.resize(imagen_val, (ancho_val, alto_val))
                 
-                # Convertir imagen a JPG con calidad a 90%
-                ok_val, imagen_val = cv2.imencode(".jpg", imagen_val, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                # Convertir imagen a JPG
+                ok_val, imagen_val = cv2.imencode(".jpg", imagen_val, [cv2.IMWRITE_JPEG_QUALITY, 100])
                 imagen_val = cv2.imdecode(imagen_val, cv2.IMREAD_UNCHANGED) # Decodificar el buffer de memoria para volver a obtener la imagen ya comprimida en formato OpenCV
 
                 # Ruta relativa
